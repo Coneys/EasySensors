@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.github.coneys" >
+    
+    <application>
+
+        <provider android:authorities="${applicationId}.SensorInitProvider"
+            android:name=".settings.SensorInitProvider"/>
+
+    </application>
+    
+</manifest>
