@@ -26,7 +26,7 @@ abstract class RotationSensor(sensorType: Int)
         return dataHolder
     }
 
-    private fun calculateXAngle() = calculateAngle(orientation[0].toDouble())
+    private fun calculateXAngle() = calculateAngle(orientation[2].toDouble())
     private fun calculateYAngle() = calculateAngle(orientation[1].toDouble())
 
     private fun calculateAngle(orientation: Double) = ((Math.toDegrees(orientation) + 90).toInt()).toFloat()
