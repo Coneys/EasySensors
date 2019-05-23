@@ -10,15 +10,17 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.github.coneys.settings.SensorSettings
 
-class SensorSessions(requestedSessions: Set<SensorSession<*>> = HashSet(),
-                     private val lifecycleOwner: LifecycleOwner,
-                     private val samplingPeriod: Int = SENSOR_DELAY_GAME) : SensorEventListener, LifecycleObserver {
+class SensorSessions(
+        requestedSessions: Set<SensorSession<*>> = HashSet(),
+        private val samplingPeriod: Int = SENSOR_DELAY_GAME
+) : SensorEventListener, LifecycleObserver {
 
     private val sensorManager = SensorSettings.sensorManager
 
     private val sessions = requestedSessions.removeUnavailable()
 
-    init {
+
+    fun setupWith(lifecycleOwner: LifecycleOwner) {
         lifecycleOwner.lifecycle.addObserver(this)
     }
 
@@ -38,12 +40,12 @@ class SensorSessions(requestedSessions: Set<SensorSession<*>> = HashSet(),
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun doOnPause() {
+    fun pauseListening() {
         sensorManager.unregisterListener(this)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun doOnResume() {
+    fun resumeListening() {
         sessions.forEach {
             sensorManager.registerListener(this, it.sensor.androidSensor, samplingPeriod)
         }
@@ -53,12 +55,13 @@ class SensorSessions(requestedSessions: Set<SensorSession<*>> = HashSet(),
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun stopListening() {
         sensorManager.unregisterListener(this)
-        lifecycleOwner.lifecycle.removeObserver(this)
     }
 
     private fun Set<SensorSession<*>>.removeUnavailable() = this.filter { session ->
         session.sensor.exists.also {
-            if (!it) { session.sensorListener.onUnavailable() }
+            if (!it) {
+                session.sensorListener.onUnavailable()
+            }
         }
     }
 
